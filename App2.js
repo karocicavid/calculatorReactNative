@@ -1,20 +1,21 @@
 import React , {Component} from 'react';
 import {StyleSheet,Text,View,Button, TouchableOpacity} from 'react-native';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 export default class App extends Component{
   constructor(){
     super()
     this.state = {
         resultText : '',
-         operationText : '',
+        operationText : '',
         isZeroExist : false,
         isDotExist : false,
         isParenthesisExist : false
     }
+    
   } 
+  
   delLastSign(myString){
-    let str = myString.toString();
+    let str = myString.toString()
     let newStr = str.substring(0,str.length-1);
     return newStr;
   }
@@ -27,91 +28,178 @@ export default class App extends Component{
     let newStr = myString.split("").reverse().join("");
     for(let char of newStr){
       if(char == ')'){return true}
-      if(char=='('){return false}
+      if(char =='('){return false}
     } 
     return true;
   }
+  checkingLength(myString){
+    let newStr = myString.split("").reverse().join("");
+    let newStr1 =  newStr.split('+')[0];
+    let newStr2 =  newStr1.split('-')[0];
+    let newStr3 =  newStr2.split('/')[0];
+    let newStr4 =  newStr3.split('*')[0];
+    let stringLength = 0
+    for(let char of newStr4){
+      if(char > 0 && char <= 9){
+        stringLength += 1
+      }
+    } 
+    return stringLength;
+  }
+  checkingLastZeroOrNOt(myString){
+    let newStr = myString.split("").reverse().join("");
+    let newStr1 =  newStr.split('+')[0];
+    let newStr2 =  newStr1.split('-')[0];
+    let newStr3 =  newStr2.split('/')[0];
+    let newStr4 =  newStr3.split('*')[0];
+    if(newStr4==0){return true}
+    else{return false}
+  }
+  checkingDotExist(myString){
+    let newStr = myString.split("").reverse().join("");
+    let newStr1 =  newStr.split('+')[0];
+    let newStr2 =  newStr1.split('-')[0];
+    let newStr3 =  newStr2.split('/')[0];
+    let newStr4 =  newStr3.split('*')[0];
+    for(let char of newStr4){
+      if(char == '.'){return true}
+    }
+    return false;
+  }
+  
 
    buttonPressed(getValue) {
-        if(this.state.resultText !==''){
-            this.setState({operationText : this.state.resultText,resultText : '' })
+     try {
+      if(this.state.resultText !==''){
+        if(getValue == '+' || getValue == '-' || getValue == '/' || getValue == '*'){
+          this.setState({operationText : this.state.resultText + getValue , resultText : '' })
         }
-
-        if(getValue>=0 && getValue<=9 && !this.state.isZeroExist){//1 case(default)
-          if(getValue == 0 && this.state.operationText<=0){
-            this.setState({
-              operationText : this.state.operationText += getValue,
-              isZeroExist : true,})
-          }
-          else{
-            this.setState({
-              operationText : this.state.operationText += getValue,})
-          }
-          this.setState({isSignExist:false})
+        else if(getValue <=9 && getValue >=0){
+          this.setState({operationText :  getValue , resultText : '' })
         }
-
-        else if(getValue>=0 && getValue<=9 && this.state.isZeroExist && this.state.isDotExist){//2 case
-          this.setState({
-            operationText : this.state.operationText += getValue,
-            secondNum : parseFloat(this.state.operationText),
-            isSignExist : false
-        })}
-
-        else if(getValue === '.' && !this.state.isDotExist){//3 case(dot)
-          if(this.state.operationText == ''){
-            this.setState({
-              operationText : this.state.operationText = '0.',
-          })}
-          else if(this.state.operationText !==''){
-            this.setState({
-              operationText : this.state.operationText + '.'
-          })}
-          this.setState({
-            isDotExist : true
-          })
-        }  
-
-        else if(getValue == '+'||getValue == '-'||getValue == '/'||getValue == '*'){ //4 case(operations)
-          if(this.getLastSign(this.state.operationText) >= 0 && this.getLastSign(this.state.operationText) <=9 && this.state.operationText !=='' ||this.getLastSign(this.state.operationText)==')' ){
-            if(this.getLastSign(this.state.operationText) == '+' ||this.getLastSign(this.state.operationText) == '-'||this.getLastSign(this.state.operationText) == '*'||this.getLastSign(this.state.operationText) == '/'){
-              this.setState({operationText : this.delLastSign(this.state.operationText) + getValue}) 
-            }
-            else{
-              this.setState({operationText : this.state.operationText + getValue}) 
-            }
-            this.setState({
-              isZeroExist : false,
-              isDotExist : false,
-              isParenthesisExist : false
-            })
-          } 
+        else if(getValue =='='){
+          this.setState({operationText : this.state.resultText , resultText : '' })
         }
-
-        else if(getValue == '='){
-          this.setState({
-            resultText : eval(this.state.operationText)
-          })
+        else if(getValue =='.'){
+          this.setState({operationText : '0.' , resultText : '' })
         }
-
-        else if(getValue == 'C'){
-          this.setState({
-            resultText : '',
-            operationText : '',
-            isZeroExist : false,
-            isDotExist : false,
-            isParenthesisExist : false
-          })
-        }
-        else if(getValue == 'del'){
-          this.setState({operationText : this.delLastSign(this.state.operationText) })
-        }
-        else if(getValue == '('){
-          if(this.parenthesisCheck(this.state.operationText)){this.setState({operationText : this.state.operationText + getValue}) }
-        }
-        else if(getValue == ')'){
-          if(!this.parenthesisCheck(this.state.operationText)){this.setState({operationText : this.state.operationText + getValue}) }
+        else {
+          this.setState({operationText : '' , resultText : '' })
         }
     }
+    else if(getValue>=0 && getValue<=9 && !this.state.isZeroExist){
+      if(getValue == 0 ){ 
+        this.setState({
+          operationText : this.state.operationText += getValue,
+          isZeroExist : true,})
+      }
+      else{
+        this.setState({
+          operationText : this.state.operationText += getValue,})
+      }
+      this.setState({isSignExist:false})
+    }
+    else if(getValue>=0 && getValue<=9 && this.state.isZeroExist && this.state.isDotExist){
+      if(getValue == 0 ){ 
+        this.setState({
+          operationText : this.state.operationText += getValue,
+          isZeroExist : true,})
+      }
+      else{
+        this.setState({
+          operationText : this.state.operationText += getValue,})
+      }
+      this.setState({isSignExist:false})
+    }
+    else if(getValue>0 && getValue<=9 ){
+      if(this.getLastSign(this.state.operationText)=='.'){
+          this.setState({
+        operationText : this.state.operationText + getValue})
+      }
+      else if(this.checkingLastZeroOrNOt(this.state.operationText)){
+          this.setState({
+        operationText : this.delLastSign(this.state.operationText) + getValue})
+      }
+      else{this.setState({
+        operationText : this.state.operationText += getValue,})
+      }
+    }
+    else if(getValue==0 && this.checkingLength(this.state.operationText)>0 ){
+      this.setState({
+        operationText : this.state.operationText += getValue,})
+    }
+
+    else if(getValue == '.' && !this.checkingDotExist(this.state.operationText)){
+      if(this.state.operationText == ''){
+        this.setState({
+          operationText : this.state.operationText += '0.',
+      })}
+      else if(this.getLastSign(this.state.operationText) == '+' || this.getLastSign(this.state.operationText) == '-'||this.getLastSign(this.state.operationText) == '/'||this.getLastSign(this.state.operationText) == '*'){
+        this.setState({
+          operationText : this.state.operationText + '0.'
+      })}
+      else if(this.state.operationText !=='' && this.getLastSign(this.state.operationText)>=0 && this.getLastSign(this.state.operationText)<=9){
+        this.setState({
+          operationText : this.state.operationText + '.'
+      })}
+      this.setState({
+        isDotExist : true
+      })
+    }  
+
+    else if(getValue == '+'||getValue == '-'||getValue == '/'||getValue == '*'){ // case(operations)
+      if(this.getLastSign(this.state.operationText) >= 0 && this.getLastSign(this.state.operationText) <=9 && this.state.operationText !=='' ||this.getLastSign(this.state.operationText)==')' ){
+        if(this.getLastSign(this.state.operationText) == '+' ||this.getLastSign(this.state.operationText) == '-'||this.getLastSign(this.state.operationText) == '*'||this.getLastSign(this.state.operationText) == '/'){
+          this.setState({operationText : this.delLastSign(this.state.operationText) + getValue}) 
+        }
+        else{
+          this.setState({operationText : this.state.operationText + getValue}) 
+        }
+        this.setState({
+          isZeroExist : false,
+          isDotExist : false,
+          isParenthesisExist : false
+        })
+      } 
+    }
+
+    else if(getValue == '='){
+      this.setState({
+        resultText : eval(this.state.operationText)
+      })
+    }
+
+    else if(getValue == 'C'){
+      this.setState({
+        resultText : '',
+        operationText : '',
+        isZeroExist : false,
+        isDotExist : false,
+        isParenthesisExist : false
+      })
+    }
+    else if(getValue == 'del'){
+      if(this.getLastSign(this.state.operationText)=='.'){
+        this.setState({operationText : this.delLastSign(this.state.operationText) , isDotExist : false})
+      }
+      if(this.getLastSign(this.state.operationText)=='-'||this.getLastSign(this.state.operationText)=='+'||this.getLastSign(this.state.operationText)=='*'||this.getLastSign(this.state.operationText)=='/'){
+        this.setState({operationText : this.delLastSign(this.state.operationText) , isDotExist : true,isZeroExist:true})
+      }
+      else{
+        this.setState({operationText : this.delLastSign(this.state.operationText) })
+      }
+    }
+    else if(getValue == '('){
+      if(this.parenthesisCheck(this.state.operationText)){this.setState({operationText : this.state.operationText + getValue}) }
+    }
+    else if(getValue == ')'){
+      if(!this.parenthesisCheck(this.state.operationText)){this.setState({operationText : this.state.operationText + getValue}) }
+    }  
+     } catch (error) {
+       this.setState({operationText:'Olan sheydi mellim'})
+     }
+    
+  }
   
   render(){
     let myElems = [['(',')','del','/'],['1','2','3','+'],['4','5','6','-'],['7','8','9','*'],['C',0,'=','.']];
@@ -143,7 +231,7 @@ export default class App extends Component{
               <Text style={styles.resultText}>{this.state.resultText}</Text>
           </View>
           <View style = {styles.buttons}>
-          {rows} 
+              {rows}
           </View>
       </View>
     );
